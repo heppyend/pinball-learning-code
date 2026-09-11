@@ -1,0 +1,601 @@
+﻿
+/******************************************************************************
+ * 
+ *  Title:  捕鱼项目
+ *
+ *  Version:  1.0版
+ *
+ *  Description:
+ *         1：管理UI界面的管理类
+ *
+ *  Author:  WangXingXing
+ *       
+ *  Date:  2018
+ * 
+ ******************************************************************************/
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+//using System.Threading.Tasks;
+using UnityEngine;
+
+public class UIManager : Singleton<UIManager>
+{
+    /// <summary>
+    /// UI窗体信息
+    /// </summary>
+    struct UIInfoData
+    {
+        public EnumUIType UIType { get; private set; }
+        public string Path { get; private set; }
+        public Type ScriptType { get; private set; }
+        public object[] UIparams { get; private set; }
+        public UIInfoData GetUIInfoData(EnumUIType uiType, string componentType, params object[] uiParams)
+        {
+           // Debug.LogError($"GetUIInfoData,{uiType},{componentType}");
+            UIType = uiType;
+            Path = UIPathDefines.GetPrefabPathByType(uiType, componentType);
+            UIparams = uiParams;
+            ScriptType = UIPathDefines.GetUIScriptByType(uiType, componentType);
+            return this;
+        }
+    }
+
+    private Dictionary<EnumUIType, GameObject> dicOpenUIs = null;
+    private Stack<UIInfoData> stackOpenUIs = null;
+
+    public override void Init()
+    {
+        dicOpenUIs = new Dictionary<EnumUIType, GameObject>();
+        stackOpenUIs = new Stack<UIInfoData>();
+    }
+
+    public T GetUI<T>(EnumUIType uiType) where T : BaseUI
+    {
+        GameObject retObj = GetUIObject(uiType);
+        if (null != retObj)
+            return retObj.GetComponent<T>();
+        return null;
+    }
+
+    public GameObject GetUIObject(EnumUIType uiType)
+    {
+        GameObject retObj = null;
+        if (!dicOpenUIs.TryGetValue(uiType, out retObj))
+        {
+            var msg = string.Format("dicOpenUIs TryGetValue Failure! uiType :{0}", uiType);
+            throw new Exception(msg);
+        }
+        return retObj;
+    }
+
+    public void PreloadUI(EnumUIType[] uiTypes, string[] componentType)
+    {
+        var len = uiTypes.Length;
+        if (len != componentType.Length)
+        {
+            Debug.LogErrorFormat($"uiTypes Length != componentType Length.uiTypes Length{len},componentType Length{componentType.Length}");
+            return;
+        }
+        for (int i = 0; i < len; i++)
+        {
+            PreloadUI(uiTypes[i], componentType[i]);
+        }
+    }
+
+    public void PreloadUI(EnumUIType[] uITypes)
+    {
+        var len = uITypes.Length;
+        for (int i = 0; i < len; i++)
+        {
+            PreloadUI(uITypes[i]);
+        }
+    }
+
+    /// <summary>
+    /// 预加载
+    /// </summary>
+    /// <param name="uiType">UI类型</param>
+    /// <param name="componentType">组件类型</param>
+    public void PreloadUI(EnumUIType uiType,string componentType)
+    {
+        string path = UIPathDefines.GetPrefabPathByType(uiType, componentType);
+        ResManager.Instance.LoadPrefab(path);
+        //ResManager.Instance.LoadAsync<GameObject>(path, null);
+    }
+
+    /// <summary>
+    /// 预加载
+    /// </summary>
+    /// <param name="uiType">UI类型</param>
+    public async void PreloadUI(EnumUIType uiType)
+    {
+        string path = UIPathDefines.GetPrefabPathByType(uiType, string.Empty);
+		// ResManager.Instance.LoadPrefab(path);
+
+		GameObject prefab = await ResManager.Instance.LoadPrefabAsync(path);
+
+		//GameObject prefab = ResManager.Instance.LoadPrefabAsync(path);
+	}
+
+    public void OpenMessageBoxUI(string content, int countTime = 10, EnumMessageBoxType type = EnumMessageBoxType.OK_CANCEL,
+                                 MethodAction btnOK = null, object btnOKParam = null,
+                                 MethodAction btnRelease = null, object btnReleaseParam = null,
+                                 params object[] uiParams)
+    {
+        OpenMessageBoxUI(null, content, countTime, type, btnOK, btnOKParam, btnRelease, btnReleaseParam, uiParams);
+    }
+
+    //打开两个按钮的弹窗
+    public void OpenMessageBoxUI(string title, string content, int countTime = 10, EnumMessageBoxType type = EnumMessageBoxType.OK_CANCEL,
+                                 MethodAction btnOK = null, object btnOKParam = null,
+                                 MethodAction btnRelease = null,object btnReleaseParam = null,
+                                 params object[] uiParams)
+    {
+        content = content.Replace("公会","小镇");
+        OpenUI(EnumUIType.MessageBoxUI, uiParams);
+    }
+
+    /// <summary>
+    /// 打开多个UI面板不关闭已打开的UI面板
+    /// </summary>
+    /// <param name="uITypes">打开面板的UI类型数组</param>
+    public void OpenUI(EnumUIType[] uITypes)
+    {
+        OpenUI(false, uITypes, string.Empty, null);
+    }
+
+    /// <summary>
+    /// 打开UI面板不关闭已打开的UI面板
+    /// </summary>
+    /// <param name="uiType">UI类型</param>
+    /// <param name="uiParams">可变参数</param>
+    public void OpenUI(EnumUIType uiType, params object[] uiParams)
+    {
+        //Debug.LogError("---------------OpenUI="+ uiType);
+
+        EnumUIType[] uiTypes = new EnumUIType[] { uiType };
+        OpenUI(false, uiTypes, string.Empty, uiParams);
+    }
+
+    /// <summary>
+    /// 打开UI面板不关闭已打开的UI面板
+    /// </summary>
+    /// <param name="uiType">UI类型</param>
+    /// <param name="componentType">组件类型</param>
+    /// <param name="uiParams">可变参数</param>
+    public void OpenUI(EnumUIType uiType, string componentType, params object[] uiParams)
+    {
+        EnumUIType[] uiTypes = new EnumUIType[] { uiType };
+        OpenUI(false, uiTypes, componentType, uiParams);
+    }
+
+    /// <summary>
+    /// 打开多个UI面板兵关闭其他面板
+    /// </summary>
+    /// <param name="uiTypes">打开面板的UI类型数组</param>
+    public void OpenUICloseOthers(EnumUIType[] uiTypes)
+    {
+        OpenUI(true, uiTypes, string.Empty, null);
+    }
+
+    /// <summary>
+    /// 打开多个UI面板兵关闭其他面板
+    /// </summary>
+    /// <param name="uiType">UI类型</param>
+    /// <param name="uiParams">可变参数</param>
+    public void OpenUICloseOthers(EnumUIType uiType, params object[] uiParams)
+    {
+        EnumUIType[] uiTypes = new EnumUIType[] { uiType };
+        OpenUI(true, uiTypes, string.Empty, uiParams);
+    }
+
+    /// <summary>
+    /// 打开多个UI面板兵关闭其他面板
+    /// </summary>
+    /// <param name="uiType">UI类型</param>
+    /// <param name="componentType">组件类型</param>
+    /// <param name="uiParams">可变参数</param>
+    public void OpenUICloseOthers(EnumUIType uiType, string componentType, params object[] uiParams)
+    {
+        EnumUIType[] uiTypes = new EnumUIType[] { uiType };
+        OpenUI(true, uiTypes, componentType, uiParams);
+    }
+
+    /// <summary>
+    /// 打开UI面板
+    /// </summary>
+    /// <param name="isCloseOthers">是否关闭已打开的UI的面板</param>
+    /// <param name="uiTypes">UI类型数组</param>
+    /// <param name="componentType">组件类型</param>
+    /// <param name="uiParams">可变参数</param>
+    public async void OpenUI(bool isCloseOthers, EnumUIType[] uiTypes, string componentType, params object[] uiParams)
+    {
+        if (isCloseOthers)
+            CloseUIAll();
+        for (int i = 0; i < uiTypes.Length; i++)
+        {
+            EnumUIType uiType = uiTypes[i];
+
+            //Debug.LogError("---------------uiType=" + uiType + "," + dicOpenUIs.ContainsKey(uiType));
+
+            if (!dicOpenUIs.ContainsKey(uiType))
+                stackOpenUIs.Push(new UIInfoData().GetUIInfoData(uiType, componentType, uiParams));
+        }
+
+		//Debug.LogError("---------------stackOpenUIs.Count=" + stackOpenUIs.Count);
+
+		if (stackOpenUIs.Count > 0)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            CoroutineController.Instance.StartCoroutine(AsyncLoadDataWebGL());
+#else
+            CoroutineController.Instance.StartCoroutine(AsyncLoadData());
+#endif
+            //CoroutineController.Instance.StartCoroutine(AsyncLoadData1());
+           // await AsyncLoadData();
+        }
+    }
+    public void OpenUI1(EnumUIType uiType, params object[] uiParams)
+    {
+        //Debug.LogError("---------------OpenUI="+ uiType);
+
+        EnumUIType[] uiTypes = new EnumUIType[] { uiType };
+        OpenUI1(false, uiTypes, string.Empty, uiParams);
+    }
+    public async void OpenUI1(bool isCloseOthers, EnumUIType[] uiTypes, string componentType, params object[] uiParams)
+    {
+
+        for (int i = 0; i < uiTypes.Length; i++)
+        {
+            EnumUIType uiType = uiTypes[i];
+
+            Debug.LogWarning("---------------uiType=" + uiType + "," + dicOpenUIs.ContainsKey(uiType));
+
+            if (!dicOpenUIs.ContainsKey(uiType))
+                stackOpenUIs.Push(new UIInfoData().GetUIInfoData(uiType, componentType, uiParams));
+        }
+
+    }
+
+    ///*
+    private IEnumerator<int> AsyncLoadData()
+	{
+		UIInfoData uiInfoData;
+		UnityEngine.Object prefabObj = null;
+		GameObject uiObj = null;
+		if (!ReferenceEquals(stackOpenUIs, null) && stackOpenUIs.Count > 0)
+		{
+			do
+			{
+				uiInfoData = stackOpenUIs.Pop();
+				prefabObj = ResManager.Instance.LoadPrefab(uiInfoData.Path);
+
+                //Debug.LogError("---------------uiInfoData.Path=" + uiInfoData.Path+ ",uiInfoData.UIType:" + uiInfoData.UIType);
+
+                if (!ReferenceEquals(prefabObj, null))
+				{
+					uiObj = UnityEngine.Object.Instantiate(prefabObj) as GameObject;
+					BaseUI baseUI = uiObj.GetComponent<BaseUI>();                   
+
+                    if (ReferenceEquals(baseUI, null))
+						baseUI = uiObj.AddComponent(uiInfoData.ScriptType) as BaseUI;
+
+                    if (uiInfoData.UIType == EnumUIType.MainUI || uiInfoData.UIType == EnumUIType.FishingSelectUI || uiInfoData.UIType == EnumUIType.FishingCommonUI)
+                        baseUI.enabled = false;
+
+                    baseUI.SetUIWhenOpening(uiInfoData.UIparams);
+					dicOpenUIs.Add(uiInfoData.UIType, uiObj);
+				}
+			} while (stackOpenUIs.Count > 0);
+		}
+		yield return 0;
+	}//*/
+
+	// AsyncLoadData 保持协程方式
+	//private IEnumerator<int> AsyncLoadData()
+	//{
+	//	//Debug.LogError("---------------.AsyncLoadData=");
+
+	//	if (stackOpenUIs == null || stackOpenUIs.Count == 0)
+	//	{
+	//		yield return 0;
+	//		yield break;
+	//	}
+
+	//	while (stackOpenUIs.Count > 0)
+	//	{
+	//		UIInfoData uiInfoData = stackOpenUIs.Pop();
+
+	//		// 启动异步任务
+	//		var loadTask = LoadAndInstantiateUIAsync(uiInfoData);
+
+	//		// 等待任务完成
+	//		while (!loadTask.IsCompleted)
+	//		{
+	//			yield return 0; // 每帧检查，保持UI响应
+	//		}
+
+	//		// 检查是否成功
+	//		if (loadTask.IsFaulted)
+	//		{
+	//			Debug.LogError($"加载UI失败: {loadTask.Exception}");
+	//		}
+
+	//		// 每加载一个等待一帧
+	//		yield return 0;
+	//	}
+
+	//	yield return 0;
+	//}
+
+
+	// 单独的异步方法
+	private async Task LoadAndInstantiateUIAsync(UIInfoData uiInfoData)
+	{
+		//Debug.LogError("---------------.LoadAndInstantiateUIAsync=" + uiInfoData.Path);
+		try
+		{
+			UnityEngine.Object prefabObj = await ResManager.Instance.LoadPrefabAsync(uiInfoData.Path);
+
+
+			Debug.LogError("---------------.prefabObj=" + prefabObj);
+
+			if (!ReferenceEquals(prefabObj, null))
+			{
+				GameObject uiObj = UnityEngine.Object.Instantiate(prefabObj) as GameObject;
+				Debug.LogError("---------------uiObj=" + uiObj);
+				BaseUI baseUI = uiObj.GetComponent<BaseUI>();
+				if (ReferenceEquals(baseUI, null))
+					baseUI = uiObj.AddComponent(uiInfoData.ScriptType) as BaseUI;
+				baseUI.SetUIWhenOpening(uiInfoData.UIparams);
+
+				// 注意：字典操作也需要在主线程
+				lock (dicOpenUIs)
+				{
+					dicOpenUIs.Add(uiInfoData.UIType, uiObj);
+				}
+
+			}
+		}
+		catch (Exception ex)
+		{
+			Debug.LogError($"加载UI {uiInfoData.UIType} 失败: {ex.Message}");
+		}
+	}
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+    private IEnumerator AsyncLoadDataWebGL()
+    {
+        while (stackOpenUIs != null && stackOpenUIs.Count > 0)
+        {
+            UIInfoData uiInfoData = stackOpenUIs.Pop();
+            GameObject prefab = null;
+            yield return ResManager.Instance.LoadAsyncCoroutine<GameObject>(uiInfoData.Path, asset => prefab = asset);
+            if (prefab == null)
+            {
+                Debug.LogError($"[WebGL UI加载] 预制体为空：UI={uiInfoData.UIType}, Path={uiInfoData.Path}");
+                continue;
+            }
+
+            GameObject uiObj = UnityEngine.Object.Instantiate(prefab);
+            BaseUI baseUI = uiObj.GetComponent<BaseUI>();
+            if (baseUI == null)
+                baseUI = uiObj.AddComponent(uiInfoData.ScriptType) as BaseUI;
+            baseUI.SetUIWhenOpening(uiInfoData.UIparams);
+            dicOpenUIs.Add(uiInfoData.UIType, uiObj);
+        }
+    }
+#endif
+
+	
+
+	private IEnumerator AsyncLoadData1()
+	{
+        //Debug.LogError($"AsyncLoadData====1 开始");
+
+        if (stackOpenUIs == null || stackOpenUIs.Count == 0)
+		{
+			yield break;
+		}
+        //Debug.LogError($"AsyncLoadData====2，中间"+ stackOpenUIs.Count);
+        while (stackOpenUIs.Count > 0)
+		{
+			UIInfoData uiInfoData = stackOpenUIs.Pop();
+
+            //Debug.LogError($"AsyncLoadData====3 内部");
+
+            // 启动加载协程
+           // CoroutineController.Instance.StartCoroutine(LoadAndInstantiateUI(uiInfoData));
+           yield return LoadAndInstantiateUI(uiInfoData);
+            // 等待一帧
+            yield return 0;
+
+        }
+	}
+	private async Task LoadAndInstantiateUI(UIInfoData uiInfoData)
+	{
+		//Debug.LogError($"加载UI: {uiInfoData.Path}");
+
+		// 加载预制体（假设 LoadPrefabAsync 返回 GameObject）
+		GameObject prefabObj = null;
+
+        //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+
+        // 1. 检测加载耗时
+        //sw.Start();
+
+        // 方法1：使用现有的同步方法
+        // prefabObj = ResManager.Instance.LoadPrefab(uiInfoData.Path);
+        // yield return null; // 等待一帧
+
+        // 方法2：如果有真正的异步方法
+        prefabObj = await ResManager.Instance.LoadPrefabAsync(uiInfoData.Path);
+      //  Debug.LogError($"？: {prefabObj}");
+
+        //sw.Stop();
+        //Debug.LogError($"加载完成: {sw.ElapsedMilliseconds}ms, prefabObj: {prefabObj != null}");
+
+       // Debug.LogError($"加载完成: {prefabObj}");
+
+		if (prefabObj != null)
+		{
+            // System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+
+            // 第1步：加载预制体
+            //  sw.Start();
+            //sw.Restart();
+
+            GameObject uiObj = GameObject.Instantiate(prefabObj);
+          //  Debug.LogError($"实例化: {uiObj}");
+            //sw.Stop();
+            //Debug.LogError($"第2步-Instantiate耗时: {sw.ElapsedMilliseconds}ms");
+
+            // 第3步：获取/添加组件
+            // sw.Restart();
+            BaseUI baseUI = uiObj.GetComponent<BaseUI>();
+			if (baseUI == null)
+				baseUI = uiObj.AddComponent(uiInfoData.ScriptType) as BaseUI;
+         //   Debug.LogError($"添加主键: {baseUI},{uiInfoData.UIparams}");
+            //  sw.Stop();
+            // Debug.LogError($"第3步-组件处理耗时: {sw.ElapsedMilliseconds}ms, 组件类型: {uiInfoData.ScriptType}");
+
+            // 第4步：UI初始化
+            //   sw.Restart();
+
+            baseUI.SetUIWhenOpening(uiInfoData.UIparams);
+          //  sw.Stop();
+          //  Debug.LogError($"第4步-SetUIWhenOpening耗时: {sw.ElapsedMilliseconds}ms");
+
+            // 第5步：添加到字典
+          //  sw.Restart();
+
+            lock (dicOpenUIs)
+			{
+                //Debug.LogError($"打开: {uiInfoData.UIType}");
+                dicOpenUIs.Add(uiInfoData.UIType, uiObj);
+			}
+
+          //  sw.Stop();
+          //  Debug.LogError($"第5步-添加到字典耗时: {sw.ElapsedMilliseconds}ms");
+
+            // 第6步：检查UI的Awake/OnEnable
+          //  Debug.LogError($"总共耗时: {sw.ElapsedMilliseconds}ms (从开始到结束)");
+        }
+	}
+
+	public void CloseUIAll()
+    {
+        List<EnumUIType> listKey = new List<EnumUIType>(dicOpenUIs.Keys);
+        for (int i = 0; i < listKey.Count; i++)
+        {
+            CloseUI(listKey[i]);
+        }
+        dicOpenUIs.Clear();
+    }
+
+    public void CloseUI(EnumUIType[] uiTypes)
+    {
+        for (int i = 0; i < uiTypes.Length; i++)
+        {
+            CloseUI(uiTypes[i]);
+        }
+    }
+
+    public void CloseUI(EnumUIType uiType)
+    {
+	    if (!dicOpenUIs.ContainsKey(uiType))
+	    {
+		    return;
+	    }
+	    
+        GameObject uiObj = GetUIObject(uiType);
+        //Debug.LogError("CloseUI>>>>>>,uiObj:" + uiObj);
+
+        if (null == uiObj)
+        {            
+            dicOpenUIs.Remove(uiType);
+        }
+        else
+        {
+            BaseUI baseUI = uiObj.GetComponent<BaseUI>();
+            if (null == baseUI)
+            {
+                ////Debug.Log(uiObj.name);
+                UnityEngine.Object.Destroy(uiObj);
+                dicOpenUIs.Remove(uiType);
+            }
+            else
+            {
+                baseUI.StateChanged += CloseUIHandle;
+                baseUI.Release();
+            }
+        }
+    }
+
+    public void CloseUIHandle(object sender, EnumObjectState newState, EnumObjectState oldState)
+    {
+        if (newState == EnumObjectState.Closing)
+        {
+            BaseUI baseUI = sender as BaseUI;
+            dicOpenUIs.Remove(baseUI.GetUIType());
+            baseUI.StateChanged -= CloseUIHandle;
+        }
+    }
+
+    //获得所有的打开的面板
+    public Dictionary<EnumUIType, GameObject> GetDicOpenUIs()
+    {
+        return dicOpenUIs;
+    }
+
+    //获取最上层的UI面板
+    public EnumUIType GetCurrentUI()
+    {
+        EnumUIType curUIType = EnumUIType.None;
+        if (dicOpenUIs.Count >0 )
+            curUIType = dicOpenUIs.Last().Key;
+        return curUIType;
+    }
+
+    //打开的UI面板中可有此类型的UI
+    public bool FindUIByUIType(EnumUIType uiType)
+    {
+        return dicOpenUIs.ContainsKey(uiType);
+    }
+
+    #region HotUpdate
+    private Dictionary<string, GameObject> dicOpenUIsLua = new Dictionary<string, GameObject>();
+    public void BindLuaUIObject(GameObject uiObj, string name)
+    {
+        var script = uiObj.GetOrAddComponent<LuaBaseUI>();
+        script.UIName = name;
+        uiObj.transform.SetParent(GameController.Instance.UIParent, false);
+        dicOpenUIsLua.Add(name, uiObj);
+    }
+
+    public void CloseLuaUIObject(string name)
+    {
+        var script = dicOpenUIsLua[name].GetComponent<LuaBaseUI>();
+        script.Release();
+        dicOpenUIsLua.Remove(name);
+    }
+
+    public void ClearLuaUIObject()
+    {
+        foreach (var ui in dicOpenUIsLua.Values)
+        {
+            UnityEngine.Object.Destroy(ui);
+        }
+        dicOpenUIsLua.Clear();
+    }
+
+    //internal void OpenUI(EnumUIType warheadNewComposeUI, int parameter, TItem item, int itemIndex, object onUpdateAck)
+    //{
+    //    throw new NotImplementedException();
+    //}
+    #endregion
+}

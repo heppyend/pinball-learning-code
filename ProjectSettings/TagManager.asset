@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - bullet
+  - fish
+  - mainBtn
+  - fishingBtn
+  - mainRedDot
+  - fishingRedDot
+  - agateEnemy
+  - giftsItem
+  - BgBtn
+  - CBtn
+  - SiteSelfBtn
+  - BorderLeft
+  - BorderRight
+  - Border
+  - EnemyMarble
+  - Marble
+  - MarbleTrigger
+  - EnemySoldier
+  - Bullet
+  - PlayerOne
+  - PlayerTwo
+  - Player1Border
+  - Player2Border
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 1P
+  - 2P
+  - Fish
+  - Effect
+  - SiteSelfBtn
+  - Marble
+  - Laser
+  - Bullet
+  - EnemyBullet
+  - 1PBorder
+  - 2PBorder
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
