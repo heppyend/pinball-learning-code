@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 35c07ef593e573e40b119e1b04824e2d
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _Diffuse: {instanceID: 0}
+  - _Tex_ice: {fileID: 2800000, guid: fc1c5ae71ef06eb4480a2efd18f5835d, type: 3}
+  - _xiaosanmask: {instanceID: 0}
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

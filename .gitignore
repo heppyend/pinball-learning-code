@@ -48,6 +48,10 @@ UnityProject.sln.DotSettings.user
 # Locally generated inspection artifacts
 /TextToolDatas/
 /tmp/
+/Bundles/
+/wx-export/
+/Assets/HotUpdateResources/Dll/StandaloneWindows64/
+/Assets/HotUpdateResources/Dll/StandaloneWindows64.meta
 
 # Source-learning repository: exclude pure art, media, models and packaged assets.
 *.png

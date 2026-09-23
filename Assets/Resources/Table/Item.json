@@ -1,0 +1,11 @@
+[
+  {"Id":110001,"Name":"点数","Desc":"通过充值获得，开始游戏所需消耗的资源","Icon":"Item_110001","Type":1,"Quality":5,"Stack":0,"Place":0,"is_use":0,"is_use_value":0},
+  {"Id":110002,"Name":"源晶","Desc":"传奇留下来的经验结晶，可用于升级英雄等级","Icon":"Item_110002","Type":1,"Quality":5,"Stack":0,"Place":0,"is_use":0,"is_use_value":0},
+  {"Id":110003,"Name":"晶核","Desc":"通用货币，可用于抽取装备、合成装备等","Icon":"Item_110003","Type":1,"Quality":5,"Stack":0,"Place":0,"is_use":0,"is_use_value":0},
+  {"Id":110004,"Name":"启迪之星","Desc":"商店兑换道具，任务或抽卡获取","Icon":"Item_110004","Type":3,"Quality":5,"Stack":999,"Place":1,"is_use":0,"is_use_value":0},
+  {"Id":120002,"Name":"共鸣结晶·绿","Desc":"抽卡获取英雄所得，用于英雄升星","Icon":"Item_120001","Type":3,"Quality":2,"Stack":999,"Place":1,"is_use":0,"is_use_value":0},
+  {"Id":120003,"Name":"共鸣结晶·蓝","Desc":"抽卡获取英雄所得，用于英雄升星","Icon":"Item_120002","Type":3,"Quality":3,"Stack":999,"Place":1,"is_use":0,"is_use_value":0},
+  {"Id":120004,"Name":"共鸣结晶·紫","Desc":"抽卡获取英雄所得，用于英雄升星","Icon":"Item_120003","Type":3,"Quality":4,"Stack":999,"Place":1,"is_use":0,"is_use_value":0},
+  {"Id":120005,"Name":"共鸣结晶·橙","Desc":"抽卡获取英雄所得，用于英雄升星","Icon":"Item_120004","Type":3,"Quality":5,"Stack":999,"Place":1,"is_use":0,"is_use_value":0},
+  {"Id":120006,"Name":"共鸣结晶·红","Desc":"抽卡获取英雄所得，用于英雄升星","Icon":"Item_120005","Type":3,"Quality":6,"Stack":999,"Place":1,"is_use":0,"is_use_value":0}
+]

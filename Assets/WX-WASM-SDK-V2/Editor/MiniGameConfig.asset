@@ -19,8 +19,8 @@ MonoBehaviour:
     assetLoadType: 0
     compressDataPackage: 1
     VideoUrl: 
-    relativeDST: "D:/Users/Administrator/Desktop/\u5F39\u73E0\u63A5\u5165text_1/720"
-    DST: "D:/Users/Administrator/Desktop/\u5F39\u73E0\u63A5\u5165text_1/720"
+    relativeDST: wx-export
+    DST: wx-export
     StreamCDN: 
     bundleHashLength: 32
     bundlePathIdentifier: StreamingAssets;
@@ -30,7 +30,7 @@ MonoBehaviour:
     HideAfterCallMain: 1
     preloadFiles: 
     Orientation: 0
-    bgImageSrc: Assets/Resources_HotUpdate/BNRes/Textures/BossBar/BOSSBarIcon.png
+    bgImageSrc: Assets/WX-WASM-SDK-V2/Runtime/wechat-default/images/background.jpg
     dataFileSubPrefix: 
     maxStorage: 200
     defaultReleaseSize: 31457280

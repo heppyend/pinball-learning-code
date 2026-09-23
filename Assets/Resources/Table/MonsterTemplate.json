@@ -1,0 +1,14 @@
+[
+  {"Id":9999,"Name":"占位","Element":3,"Type":1,"Skill":"[999999]","MonsterHead":"Monsterhead_9999","MonsterImg":"Monsterhalf_9999","BeAtkRangeX":1,"BeAtkRangeY":1,"ResId":0,"HittedScreamAudios":1,"DeadAudio":1},
+  {"Id":1001,"Name":"野猪","Element":1,"Type":1,"Skill":"[100011]","MonsterHead":"Monsterhead_1001","MonsterImg":"Monsterhalf_1001","BeAtkRangeX":0,"BeAtkRangeY":0,"ResId":20001,"HittedScreamAudios":0,"DeadAudio":0},
+  {"Id":1002,"Name":"菜花蛇","Element":4,"Type":1,"Skill":"[100021]","MonsterHead":"Monsterhead_1002","MonsterImg":"Monsterhalf_1002","BeAtkRangeX":0,"BeAtkRangeY":0,"ResId":20002,"HittedScreamAudios":0,"DeadAudio":0},
+  {"Id":1003,"Name":"老鼠精","Element":2,"Type":1,"Skill":"[100031]","MonsterHead":"Monsterhead_1003","MonsterImg":"Monsterhalf_1003","BeAtkRangeX":0,"BeAtkRangeY":0,"ResId":20003,"HittedScreamAudios":0,"DeadAudio":0},
+  {"Id":1004,"Name":"松鼠精","Element":2,"Type":1,"Skill":"[100041]","MonsterHead":"Monsterhead_1004","MonsterImg":"Monsterhalf_1004","BeAtkRangeX":0,"BeAtkRangeY":0,"ResId":20004,"HittedScreamAudios":0,"DeadAudio":0},
+  {"Id":1005,"Name":"小妖精","Element":1,"Type":1,"Skill":"[100051]","MonsterHead":"Monsterhead_1005","MonsterImg":"Monsterhalf_1005","BeAtkRangeX":0,"BeAtkRangeY":0,"ResId":20005,"HittedScreamAudios":0,"DeadAudio":0},
+  {"Id":1006,"Name":"蛤蟆精","Element":4,"Type":1,"Skill":"[100061]","MonsterHead":"Monsterhead_1006","MonsterImg":"Monsterhalf_1006","BeAtkRangeX":0,"BeAtkRangeY":0,"ResId":20006,"HittedScreamAudios":0,"DeadAudio":0},
+  {"Id":1007,"Name":"猿猴精","Element":3,"Type":1,"Skill":"[100071]","MonsterHead":"Monsterhead_1007","MonsterImg":"Monsterhalf_1007","BeAtkRangeX":0,"BeAtkRangeY":0,"ResId":20007,"HittedScreamAudios":0,"DeadAudio":0},
+  {"Id":1008,"Name":"妖兔精","Element":2,"Type":2,"Skill":"[200011,200012]","MonsterHead":"Monsterhead_1008","MonsterImg":"Monsterhalf_1008","BeAtkRangeX":0,"BeAtkRangeY":0,"ResId":20008,"HittedScreamAudios":0,"DeadAudio":0},
+  {"Id":1009,"Name":"黑熊精","Element":3,"Type":2,"Skill":"[200021,200022]","MonsterHead":"Monsterhead_1009","MonsterImg":"Monsterhalf_1009","BeAtkRangeX":0,"BeAtkRangeY":0,"ResId":20009,"HittedScreamAudios":0,"DeadAudio":0},
+  {"Id":1010,"Name":"野猪首领","Element":3,"Type":3,"Skill":"[300011,300012]","MonsterHead":"Monsterhead_1010","MonsterImg":"Monsterhalf_1010","BeAtkRangeX":0,"BeAtkRangeY":0,"ResId":20010,"HittedScreamAudios":0,"DeadAudio":0},
+  {"Id":1011,"Name":"九头蛇","Element":5,"Type":4,"Skill":"[400011,400012,400013]","MonsterHead":"Monsterhead_1011","MonsterImg":"Monsterhalf_1011","BeAtkRangeX":0,"BeAtkRangeY":0,"ResId":20011,"HittedScreamAudios":0,"DeadAudio":0}
+]

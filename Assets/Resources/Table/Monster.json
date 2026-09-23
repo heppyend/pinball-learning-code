@@ -1,0 +1,17 @@
+[
+  {"Id":100001,"Name":"野猪","Level":1,"HpBase":800,"Attack":150,"Defence":50,"CritRate":500,"CritHurt":15000,"SkillTurn":"[2]","TpltId":1001,"Exp":10,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100002,"Name":"野猪","Level":2,"HpBase":960,"Attack":173,"Defence":55,"CritRate":500,"CritHurt":15000,"SkillTurn":"[2]","TpltId":1001,"Exp":10,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100003,"Name":"野猪","Level":3,"HpBase":1120,"Attack":195,"Defence":60,"CritRate":500,"CritHurt":15000,"SkillTurn":"[2]","TpltId":1001,"Exp":10,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100004,"Name":"菜花蛇","Level":1,"HpBase":600,"Attack":180,"Defence":30,"CritRate":800,"CritHurt":16000,"SkillTurn":"[2]","TpltId":1002,"Exp":10,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100005,"Name":"菜花蛇","Level":2,"HpBase":720,"Attack":207,"Defence":33,"CritRate":800,"CritHurt":16000,"SkillTurn":"[2]","TpltId":1002,"Exp":10,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100006,"Name":"菜花蛇","Level":3,"HpBase":840,"Attack":234,"Defence":36,"CritRate":800,"CritHurt":16000,"SkillTurn":"[2]","TpltId":1002,"Exp":10,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100007,"Name":"老鼠精","Level":5,"HpBase":900,"Attack":192,"Defence":56,"CritRate":1320,"CritHurt":18700,"SkillTurn":"[2]","TpltId":1003,"Exp":10,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100008,"Name":"松鼠精","Level":5,"HpBase":990,"Attack":208,"Defence":49,"CritRate":1100,"CritHurt":18150,"SkillTurn":"[2]","TpltId":1004,"Exp":10,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100009,"Name":"小妖精","Level":5,"HpBase":1170,"Attack":256,"Defence":42,"CritRate":660,"CritHurt":17050,"SkillTurn":"[2]","TpltId":1005,"Exp":10,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100010,"Name":"蛤蟆精","Level":5,"HpBase":1350,"Attack":224,"Defence":84,"CritRate":330,"CritHurt":15950,"SkillTurn":"[2]","TpltId":1006,"Exp":10,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100011,"Name":"猿猴精","Level":5,"HpBase":1260,"Attack":272,"Defence":63,"CritRate":440,"CritHurt":16280,"SkillTurn":"[2]","TpltId":1007,"Exp":10,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100012,"Name":"妖兔精","Level":5,"HpBase":2160,"Attack":400,"Defence":112,"CritRate":1650,"CritHurt":19800,"SkillTurn":"[2,3]","TpltId":1008,"Exp":50,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100013,"Name":"黑熊精","Level":5,"HpBase":2700,"Attack":352,"Defence":168,"CritRate":880,"CritHurt":17600,"SkillTurn":"[2,3]","TpltId":1009,"Exp":50,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100014,"Name":"野猪首领","Level":10,"HpBase":7000,"Attack":823,"Defence":285,"CritRate":1200,"CritHurt":20400,"SkillTurn":"[2,3]","TpltId":1010,"Exp":100,"SegHpShow":0,"SegHpVal":0},
+  {"Id":100015,"Name":"九头蛇","Level":10,"HpBase":11200,"Attack":940,"Defence":380,"CritRate":1440,"CritHurt":21000,"SkillTurn":"[2,3,4]","TpltId":1011,"Exp":200,"SegHpShow":1,"SegHpVal":1000}
+]

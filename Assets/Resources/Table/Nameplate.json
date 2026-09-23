@@ -1,0 +1,7 @@
+[
+  {"Id":1,"Name":"默认铭牌","Desc":"默认解锁","Sorting":1,"ClientShow": 1,"NotUnlockedClientShow":0,"ResId":53001},
+  {"Id":10001,"Name":"星光之旅","Desc":"参与首发活动奖励解锁","Sorting":2,"ClientShow":1,"NotUnlockedClientShow":0,"ResId":53002},
+  {"Id":10002,"Name":"那么大的鱼","Desc":"激活10个英雄图鉴解锁","Sorting":3,"ClientShow": 1,"NotUnlockedClientShow":0,"ResId":53003},
+  {"Id":10003,"Name":"胜者的姿态","Desc":"赛季结算排名第一解锁","Sorting":4,"ClientShow": 1,"NotUnlockedClientShow":0,"ResId":53004},
+  {"Id":10004,"Name":"专属打call","Desc":"粉丝团专属称号，加入粉丝团解锁","Sorting":5,"ClientShow": 1,"NotUnlockedClientShow":0,"ResId":53005}
+]

@@ -1,0 +1,8 @@
+[
+  {"Id":1,"Name":"默认头像","Desc":"初始头像","Sorting":1,"ClientShow": 1,"NotUnlockedClientShow":0,"Avatar":"HeroAvatar_1"},
+  {"Id":10001,"Name":"筑梦者","Desc":"参与首发活动奖励解锁","Sorting":2,"ClientShow":1,"NotUnlockedClientShow":0,"Avatar":"HeroAvatar_10001"},
+  {"Id":10002,"Name":"玉兔","Desc":"激活玉兔图鉴解锁","Sorting":3,"ClientShow": 1,"NotUnlockedClientShow":1,"Avatar":"HeroAvatar_10002"},
+  {"Id":10003,"Name":"嫦娥","Desc":"激活嫦娥图鉴解锁","Sorting":4,"ClientShow": 1,"NotUnlockedClientShow":1,"Avatar":"HeroAvatar_10003"},
+  {"Id":10004,"Name":"唐三藏","Desc":"激活唐三藏图鉴解锁","Sorting":5,"ClientShow": 1,"NotUnlockedClientShow":1,"Avatar":"HeroAvatar_10004"},
+  {"Id":10005,"Name":"孙悟空","Desc":"激活孙悟空图鉴解锁","Sorting":6,"ClientShow": 1,"NotUnlockedClientShow":1,"Avatar":"HeroAvatar_10005"}
+]

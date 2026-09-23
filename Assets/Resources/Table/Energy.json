@@ -1,0 +1,3 @@
+[
+  {"Id":1,"HeroLimit":100,"KillMinMonster":10,"KillEliteMonster":30,"KillMinBoss":50,"KillBoss":100,"Assist":5}
+]
