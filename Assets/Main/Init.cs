@@ -28,6 +28,63 @@ public class Init : MonoBehaviour
     public string FallbackHostServer;
     public bool UpdateUrl;
 
+    /// <summary>
+    /// 资源与热更代码加载完成、即将切换的**首个游戏场景**。
+    /// 留空 ⇒ 保持原行为「LoginScene」（所以既有 `Boot.unity` 的序列化值与旧版本行为一致）。
+    /// 客户端移植时配置为 `ClientShell`，即可复用本类的 YooAsset / HybridCLR 初始化链
+    /// 直接进入客户端，而无需修改 `Boot` 流程或新增第三个启动场景。
+    /// </summary>
+    [Tooltip("资源与热更代码加载完成后要加载的首个场景；留空 = LoginScene（原行为）。")]
+    public string ClientStartScene = string.Empty;
+
+    /// <summary>解析首个场景名：显式配置优先，否则回落原常量 `LoginScene`。</summary>
+    private string ResolveFirstSceneName(string configured)
+    {
+        return string.IsNullOrWhiteSpace(configured) ? "LoginScene" : configured.Trim();
+    }
+
+    /// <summary>
+    /// 加载首个场景。
+    /// **构建清单内的内置场景**（例如 `ClientShell`）改用 Unity 原生加载，不走 YooAsset 寻址；
+    /// 原生加载不可用时回落到原有的 `YooAssets.LoadSceneAsync` 地址加载（热更资源包里的场景，
+    /// 例如 `LoginScene`），保持既有行为不变。
+    ///
+    /// 背景（2026-09-22 取证）：`ClientShell` 只通过 Build Settings 打进播放器
+    /// （构建日志：`[Builder] Scenes [1]: Assets/Client/Scenes/ClientShell.unity, [x]`），
+    /// 而 YooAsset 收集器只收 `Assets/HotUpdateResources/*`，因此按地址加载必然失败：
+    /// `Failed to mapping location to asset path : ClientShell`。
+    /// </summary>
+    private IEnumerator LoadFirstSceneAsync(string sceneName)
+    {
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogError("首个场景名为空，无法加载。");
+            yield break;
+        }
+
+        Debug.Log($"首个场景加载方式判定：构建清单场景数={SceneManager.sceneCountInBuildSettings}，目标={sceneName}");
+
+        AsyncOperation sceneOperation = null;
+        try
+        {
+            sceneOperation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"内置场景加载不可用，回落到 YooAsset 地址加载：{sceneName}（{e.GetType().Name}）");
+        }
+
+        if (sceneOperation != null)
+        {
+            while (!sceneOperation.isDone) yield return null;
+            Debug.Log($"首个场景已加载（SceneManager 内置场景）：{sceneName}");
+            yield break;
+        }
+
+        Debug.Log($"首个场景走 YooAsset 地址加载：{sceneName}");
+        yield return YooAssets.LoadSceneAsync(sceneName);
+    }
+
     void Awake()
     {
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -172,19 +229,18 @@ public class Init : MonoBehaviour
 
 #endif
                 Debug.Log("加载Init");
-                const string firstSceneName = "LoginScene";
-                var sceneOperation = YooAssets.LoadSceneAsync(firstSceneName);
-                yield return sceneOperation;
-
+                string firstSceneName = ResolveFirstSceneName(ClientStartScene);
+                Debug.Log($"首个场景：{firstSceneName}（ClientStartScene={(string.IsNullOrWhiteSpace(ClientStartScene) ? "<空，使用默认>" : ClientStartScene)}）");
 #if UNITY_WEBGL && !UNITY_EDITOR
-                // 微信小游戏 WebGL 不支持当前 URP 后处理使用的若干 Shader。
-                // 先处理当前已创建的相机；后续异步实例化的 Canvas 相机由 onPreCull 回调处理。
-                yield return null;
-                ApplyWebGLRenderCompatibilityToLoadedCameras();
-                var diagnosticsHost = new GameObject("WebGLFirstScreenDiagnostics");
-                UnityEngine.Object.DontDestroyOnLoad(diagnosticsHost);
-                diagnosticsHost.AddComponent<WebGLFirstScreenDiagnosticsHost>().Begin();
+                // “加载后”的动作不能写在本协程后面：Single 模式会卸载 Boot 场景，
+                // Init（及本协程）随之中断，后面的代码永远不会执行
+                // （2026-09-22 容器日志取证：本协程之后的日志 0 命中）。
+                // 先建跨场景宿主，由它在 sceneLoaded 后执行相机兼容处理与首屏诊断。
+                var postSceneLoadRunner = new GameObject("WebGLPostSceneLoadRunner");
+                UnityEngine.Object.DontDestroyOnLoad(postSceneLoadRunner);
+                postSceneLoadRunner.AddComponent<WebGLPostSceneLoadRunner>();
 #endif
+                yield return LoadFirstSceneAsync(firstSceneName);
             }
             else
             {
@@ -257,6 +313,25 @@ public class Init : MonoBehaviour
             LoadImageErrorCode err = RuntimeApi.LoadMetadataForAOTAssembly(textAsset.bytes, mode);
             Debug.Log($"LoadMetadataForAOTAssembly:{aotDllName}. mode:{mode} ret:{err}");
         }
+    }
+
+    /// <summary>
+    /// “首个场景加载完成”后的动作入口：WebGL 相机兼容处理 + 首屏诊断。
+    ///
+    /// **不能**写在 <see cref="OnStart"/> 协程的 `yield return` 之后：加载用的是
+    /// <see cref="LoadSceneMode.Single"/>，`Boot` 场景被卸载时 `Init` 及其协程一并销毁，
+    /// 后续代码不会执行（2026-09-22 容器日志取证：该分支的 `WebGLFirstScreen` 输出 0 命中）。
+    /// 因此改由 <see cref="WebGLPostSceneLoadRunner"/> 在场景切换完成后调用本方法。
+    /// 非 WebGL 平台为空实现。
+    /// </summary>
+    internal static void RunPostSceneLoadCompatibility()
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        ApplyWebGLRenderCompatibilityToLoadedCameras();
+        var diagnosticsHost = new GameObject("WebGLFirstScreenDiagnostics");
+        UnityEngine.Object.DontDestroyOnLoad(diagnosticsHost);
+        diagnosticsHost.AddComponent<WebGLFirstScreenDiagnosticsHost>().Begin();
+#endif
     }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -497,8 +572,9 @@ public class Init : MonoBehaviour
 
     private void OnCompleted(AsyncOperationBase obj)
     {
-        //SceneManager.LoadScene("LoginScene");
-        YooAssets.LoadSceneAsync("LoginScene");
+        // 与 OnStart 共用同一个加载入口，避免两处加载目标/加载方式不一致
+        // （历史上这里也硬编码过 LoginScene；编辑器 EditorSimulateMode 下同样要能进客户端首页）。
+        StartCoroutine(LoadFirstSceneAsync(ResolveFirstSceneName(ClientStartScene)));
     }
 
 }

@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using Pinball.Client.Domain;
 using Pinball.Client.Services;
+using Pinball.Client.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Pinball.Client
 {
     /// <summary>开发期任务页：本地任务进度和奖励领取，不包含服务器日/周重置。</summary>
-    public sealed class ClientTaskPage : MonoBehaviour
+    public sealed class ClientTaskPage : ClientPageViewBase
     {
         [SerializeField] private GameObject _pageRoot;
         [SerializeField] private Text[] _taskLabels;
@@ -16,6 +17,9 @@ namespace Pinball.Client
         private readonly List<ClientTask> _tasks = new List<ClientTask>();
         private int _selectedIndex;
         private bool _claimedOnly;
+
+        protected override GameObject PageRoot { get { return _pageRoot; } }
+        protected override void OnPageRefresh() { Show(); }
 
         public void Configure(GameObject pageRoot, Text[] taskLabels, Text detail, Text status)
         {

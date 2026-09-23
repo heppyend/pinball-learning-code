@@ -21,6 +21,7 @@ namespace Pinball.Client.UI
         HeroEnhance,
         Formation,
         Marble,
+        CompleteGuideEvent,
     }
 
     public sealed class ClientUiPage : MonoBehaviour

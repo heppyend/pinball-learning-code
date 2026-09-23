@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,7 +32,7 @@ namespace QL.Core
 
         public DefaultQLClient()
         {
-            ServerUrl = "http://192.168.1.164:8000/router/rest";
+            ServerUrl = "http://0.0.0.0:8000/router/rest";
             client_ = new QLWebClient();
             Format = QLResponseFormat.Json;
         }

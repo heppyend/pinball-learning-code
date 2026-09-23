@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
@@ -175,8 +175,8 @@ public class AppRoot : MonoBehaviour
     private void InitContext()
     {
 #if HALL
-        // SysDefines.OssUrl = "https://dingyoubuyu-oss.oss-cn-shenzhen.aliyuncs.com";//"https://game.hofoo.top";
-        SysDefines.OssUrl = "https://localpinball-oss.oss-cn-shenzhen.aliyuncs.com";//"https://game.hofoo.top";
+        // SysDefines.OssUrl = "https://dingyoubuyu-oss.oss-cn-shenzhen.aliyuncs.com";//"https://example.invalid";
+        SysDefines.OssUrl = "https://cdn.invalid";//"https://example.invalid";
         //Debug.LogError("InitContext "+ _updateType+","+ _hallAssetSource+ SysDefines.OssUrl+","+SysDefines.ZoneId+"，"+ SysDefines.HotUpdateUrl);
 
         AppRoot.Hall.Config = new AssetConfig();

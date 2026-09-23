@@ -513,6 +513,9 @@ namespace JBPROTO
         }
     }
 
+    /// <summary>
+    /// 协议分发器基类，继承该类并重写onRecv_XXX方法即可处理对应的协议
+    /// </summary>
     public class ClientGTResponserBase : INetResponser
     {
         public bool processPackage(BinaryReader br, INetReactor reactor, out INetProtocol responseProto)

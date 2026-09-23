@@ -1,4 +1,4 @@
-﻿
+
 /******************************************************************************
  * 
  *  Title:  捕鱼项目
@@ -52,7 +52,7 @@ public class NetController : DDOLSingleton<NetController>
                 if (zoneId < 0)
                 {
                    // webClient.ServerUrl = "http://api2.qq1798.com:8000/router/rest";
-                    webClient.ServerUrl = "http://47.112.208.31:8000/router/rest";
+                    webClient.ServerUrl = "http://0.0.0.0:8000/router/rest";
                 }
             }
             return webClient;

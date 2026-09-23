@@ -26,9 +26,20 @@ public sealed class ClientTcpConnectionProbe : MonoBehaviour
 
     [SerializeField] private bool captureServerPackets = true;
 
-    private ClientServerPacketRouter packetRouter;
-
-#if UNITY_WEBGL && !UNITY_EDITOR
+    // ------------------------------------------------------------------
+    // 以下 [SerializeField] 字段**必须声明在 `#if UNITY_WEBGL` 之外**。
+    //
+    // 原因（2026-09-22 实测，代价是多次构建失败）：Unity 打包 AssetBundle 时会校验
+    // 「被序列化的脚本类在编辑器侧与播放器侧的字段布局是否一致」。若这些字段只在
+    // `UNITY_WEBGL && !UNITY_EDITOR` 下存在，则 Windows 编辑器看不到它们、WebGL 播放器看得到，
+    // Unity 直接拒绝构建：
+    //     Error building player because script class layout is incompatible between
+    //     the editor and the player.
+    // 并把本类的字段清单一并打印出来。
+    //
+    // 字段本身不依赖任何 WebGL 专属类型，因此放在外面是安全的；真正需要平台隔离的
+    // 是使用它们的逻辑（见下方 `#if UNITY_WEBGL` 的会话状态机与方法）。
+    // ------------------------------------------------------------------
     [SerializeField] private bool runOnStart;
     [SerializeField] private bool logDeviceIdentifier;
     [SerializeField] private bool logFullDeviceIdentifier;
@@ -42,6 +53,9 @@ public sealed class ClientTcpConnectionProbe : MonoBehaviour
     [SerializeField] private float hotFixReadyTimeoutSeconds = 15f;
     [SerializeField] private float loginResponseTimeoutSeconds = 8f;
 
+    private ClientServerPacketRouter packetRouter;
+
+#if UNITY_WEBGL && !UNITY_EDITOR
     private enum SessionStage
     {
         None,
@@ -456,17 +470,6 @@ public sealed class ClientTcpConnectionProbe : MonoBehaviour
             return;
         }
 
-        private void ParseDisconnectNotification(BinaryReader reader, int packetLength)
-        {
-            EnsureRemaining(reader, 1, "服务器断开通知");
-            byte code = reader.ReadByte();
-            EnsurePacketEnd(reader, packetLength, "服务器断开通知");
-            string reason = ClientServerPacketRouter.DescribeClientGtDisconnectCode(code);
-            Debug.LogWarning($"[TCP客户端] 收到服务器断开通知：模块=1，协议=2，断开码={code}，原因={reason}");
-            if (!heroDataReceived)
-                FailSession($"服务器断开连接：code={code}，原因={reason}");
-        }
-
         // 与新版 ClientGT.CLGTLoginAck.fromBinary 保持同一字段顺序。
         // 头像、头像框、称号、徽章、铭牌均为 Int32；不记录这些值，避免诊断日志泄露账号画像。
         reader.ReadInt32();
@@ -496,6 +499,21 @@ public sealed class ClientTcpConnectionProbe : MonoBehaviour
         SetStage(SessionStage.GetHero, 2, 1);
         StartCoroutine(SendGetHeroNextFrame());
     }
+
+    // 服务器断开通知（ClientGT 模块 1 / 协议 2）。
+    // 原先被误放在 ParseLoginAck 方法体内部，属非法 C#（CS0106）；Editor 编译因
+    // #if UNITY_WEBGL && !UNITY_EDITOR 排除该区域而掩盖了它，WebGL 构建必然失败。
+    // 此处仅把它移出为同级方法，字段顺序与判定逻辑完全未改。
+        private void ParseDisconnectNotification(BinaryReader reader, int packetLength)
+        {
+            EnsureRemaining(reader, 1, "服务器断开通知");
+            byte code = reader.ReadByte();
+            EnsurePacketEnd(reader, packetLength, "服务器断开通知");
+            string reason = ClientServerPacketRouter.DescribeClientGtDisconnectCode(code);
+            Debug.LogWarning($"[TCP客户端] 收到服务器断开通知：模块=1，协议=2，断开码={code}，原因={reason}");
+            if (!heroDataReceived)
+                FailSession($"服务器断开连接：code={code}，原因={reason}");
+        }
 
     private IEnumerator SendGetHeroNextFrame()
     {

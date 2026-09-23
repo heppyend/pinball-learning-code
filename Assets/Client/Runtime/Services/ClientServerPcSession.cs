@@ -1,3 +1,24 @@
+// ---------------------------------------------------------------------------
+// 平台边界（2026-09-20）：**WebGL / 微信小游戏下整段排除 PC 网络实现**。
+//
+// 为什么要留一个同名空壳：本组件**挂在 ClientShell 场景里**，
+// 若整体编译掉，WebGL 包里那条场景引用会变成 "Missing Script"。
+// 所以 WebGL 下保留一个空 MonoBehaviour 占位，PC 代码（TcpClient / System.Net.Sockets /
+// Task.Run / 网关反射发现）**完全不参与编译** ⇒ 小游戏包里不会带上 PC 网络栈。
+//
+// 小游戏侧的网络走 `ClientTcpConnectionProbe`（`WXBase.CreateTCPSocket`，见 TCP_WEBGL_HANDOFF.md）。
+// ---------------------------------------------------------------------------
+#if UNITY_WEBGL && !UNITY_EDITOR
+
+namespace Pinball.Client
+{
+    /// <summary>WebGL / 微信小游戏下的空壳（仅为保住场景引用，不承载任何逻辑）。</summary>
+    public sealed class ClientServerPcSession : UnityEngine.MonoBehaviour
+    {
+    }
+}
+
+#else
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -344,3 +365,5 @@ namespace Pinball.Client
         }
     }
 }
+
+#endif

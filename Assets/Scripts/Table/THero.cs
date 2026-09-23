@@ -134,6 +134,20 @@ public class THero
     /// 半身像
     /// </summary>
     public string Portrait { get; set; }
+
+    /// <summary>
+    /// 半身像-卡面
+    /// ⚠️ 2026-09-20 增量补入：最新配置表（`弹珠配置\excel\1服-弹珠\Client\Cs\THero.cs`）把旧字段 `Portrait`
+    /// 拆成了 `Portrait1`(卡面) / `Portrait2`(出战位)，而 `Assets/Client` 的卡牌需要按名加载立绘。
+    /// **`Portrait` 予以保留** —— 原项目 `Assets/Scripts/BNRoom/UI/MarbleUI.cs:1148` 仍在读它，
+    /// 删掉会破坏原项目编译。三个字段并存，各取所需。
+    /// </summary>
+    public string Portrait1 { get; set; }
+
+    /// <summary>
+    /// 半身像-出战位（同上，增量补入）
+    /// </summary>
+    public string Portrait2 { get; set; }
 }
 
 public static class THeroHelper
